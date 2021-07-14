@@ -1,12 +1,14 @@
 <!--
  * @Author: zhengrui
  * @Date: 2021-07-13 20:07:58
- * @LastEditTime: 2021-07-14 18:09:24
+ * @LastEditTime: 2021-07-14 20:51:02
  * @LastEditors: Please set LastEditors
  * @Description: 读取本地图片转换成灰度图保存
     参考：
         https://www.cnblogs.com/zhouyangla/p/7975429.html
         https://blog.csdn.net/weixin_39770416/article/details/111834448
+        https://blog.csdn.net/weixin_42460570/article/details/106280749
+        https://blog.csdn.net/tashanhongye/article/details/73064881
  * @FilePath: /jike/src/page/0710/index.vue
 -->
 <template>
@@ -24,7 +26,7 @@
     </section>
     <section class="view">
       <span class="item">
-        <img :src="uploadImg" alt="" class="view-img" ref="imageWrapper"/>
+        <img :src="uploadImg" alt="" class="view-img" ref="imageWrapper" />
       </span>
       <!--<span class="item-gray" >
         <img :src="uploadImg" alt="" class="view-img" />
@@ -50,43 +52,42 @@ export default {
     getPicture(e) {
       //使用 createObjectURL() 或者 FileReader 预览图片
       this.uploadImg = window.URL.createObjectURL(e.target.files[0]);
+      // this.$refs.imageWrapper.style.WebkitFilter="grayscale(100%)"
     },
     /* 置灰图片 */
     createGSCanvas() {
-      let img=this.$refs.imageWrapper;
+      let img = this.$refs.imageWrapper;
       var canvas = document.createElement("canvas");
       canvas.width = img.width;
       canvas.height = img.height;
-
       var ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0);
-
       var c = ctx.getImageData(0, 0, img.width, img.height);
-      for (let i = 0; i < c.height; i++) {
-        for (let j = 0; j < c.width; j++) {
-          var x = i * 4 * c.height + j * 4;
-          var r = c.data[x];
-          var g = c.data[x + 1];
-          var b = c.data[x + 2];
-          c.data[x] = c.data[x + 1] = c.data[x + 2] = (r + g + b) / 3;
+        for (let i = 0; i < c.height; i++) {
+          for (let j = 0; j < c.width; j++) {
+            var x = i * 4 * c.width + j * 4;
+            var r = c.data[x];
+            var g = c.data[x + 1];
+            var b = c.data[x + 2];
+            c.data[x] = c.data[x + 1] = c.data[x + 2] = (r + g + b) / 3;
+          }
         }
-      }
-
       ctx.putImageData(c, 0, 0, 0, 0, c.width, c.height);
-      this.canvasImg=canvas.toDataURL();
+
+      this.canvasImg = canvas.toDataURL();
     },
     /* 下载置灰的图片 */
     toSave() {
-        let aLink = document.createElement("a");
-        let blob = this.base64ToBlob(this.canvasImg);
-        let evt = document.createEvent("HTMLEvents");
-        evt.initEvent("click", true, true);
-        aLink.download = "save.png";
-        aLink.href = URL.createObjectURL(blob);
-        aLink.click();
-        if (aLink.href) {
-          console.log("保存成功");
-        }
+      let aLink = document.createElement("a");
+      let blob = this.base64ToBlob(this.canvasImg);
+      let evt = document.createEvent("HTMLEvents");
+      evt.initEvent("click", true, true);
+      aLink.download = "save.png";
+      aLink.href = URL.createObjectURL(blob);
+      aLink.click();
+      if (aLink.href) {
+        console.log("保存成功");
+      }
     },
     // 这里把图片转base64
     base64ToBlob(code) {
@@ -109,11 +110,11 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 18px;
-  .operation{
+  .operation {
     display: flex;
     flex-direction: column;
-    .item{
-       margin: 10px 0;
+    .item {
+      margin: 10px 0;
     }
   }
   .view {
@@ -121,7 +122,6 @@ export default {
     flex-direction: column;
     &-img {
       display: block;
-      width: 200px;
     }
     .item-gray {
       display: block;
@@ -129,7 +129,6 @@ export default {
       height: 200px;
       filter: gray;
       -webkit-filter: grayscale(1); /* Webkit */
-
     }
   }
 }
